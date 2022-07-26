@@ -3,9 +3,7 @@ import { Product } from '../../../../models';
 import { db } from '../../../../database';
 import { IProduct } from '../../../../interfaces';
 
-type Data =
-  | { success: boolean; data: IProduct[] }
-  | { success: boolean; error: string };
+type Data = IProduct | { success: boolean; error: string };
 
 export default function handler(
   req: NextApiRequest,
@@ -22,16 +20,18 @@ export default function handler(
   }
 }
 
-const getProductBySlug = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+const getProductBySlug = async (
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) => {
   const { slug } = req.query;
 
   try {
     await db.connect();
 
-    const product = await Product
-      .findOne({
-        slug
-      });
+    const product = await Product.findOne({
+      slug,
+    });
 
     await db.disconnect();
 
@@ -42,10 +42,7 @@ const getProductBySlug = async (req: NextApiRequest, res: NextApiResponse<Data>)
       });
     }
 
-    res.status(200).json({
-      success: true,
-      data: [product],
-    });
+    res.status(200).json(product);
   } catch (error: any) {
     await db.disconnect();
     console.log(error);

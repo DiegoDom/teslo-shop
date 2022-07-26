@@ -3,9 +3,7 @@ import { Product } from '../../../models';
 import { db } from '../../../database';
 import { IProduct } from '../../../interfaces';
 
-type Data =
-  | { success: boolean; data: IProduct[] }
-  | { success: boolean; error: string };
+type Data = IProduct[] | { success: boolean; error: string };
 
 export default function handler(
   req: NextApiRequest,
@@ -22,7 +20,10 @@ export default function handler(
   }
 }
 
-const searchProducts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+const searchProducts = async (
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) => {
   let { q = '' } = req.query;
 
   if (q.length === 0) {
@@ -37,21 +38,16 @@ const searchProducts = async (req: NextApiRequest, res: NextApiResponse<Data>) =
   try {
     await db.connect();
 
-    const products = await Product
-      .find({
-        $text: { $search: q }
-      })
+    const products = await Product.find({
+      $text: { $search: q },
+    })
       .select('title images price inStock slug -_id')
       .lean()
       .sort({ createdAt: 'ascending' });
 
     await db.disconnect();
 
-    res.status(200).json({
-      success: true,
-      data: products,
-    });
-
+    res.status(200).json(products);
   } catch (error: any) {
     await db.disconnect();
     console.log(error);

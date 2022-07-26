@@ -1,28 +1,27 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { db, SHOP_CONSTANTS } from '../../../database';
 import { IProduct } from '../../../interfaces';
 import Product from '../../../models/Product';
 
-type Data =
-  | { success: boolean; data: IProduct[] }
-  | { success: boolean; error: string };
+type Data = IProduct[] | { success: boolean; error: string };
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) {
   switch (req.method) {
     case 'GET':
       return getProducts(req, res);
     default:
       return res.status(400).json({
         error: 'El método enviado no es soportado...',
-        success: false
+        success: false,
       });
   }
 }
 
 const getProducts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   try {
-
     const { gender = 'all' } = req.query;
 
     let condition = {};
@@ -33,21 +32,15 @@ const getProducts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 
     await db.connect();
     const data = await Product.find(condition)
-                              .select('title images price inStock slug -_id')
-                              .lean()
-                              .sort({ createdAt: 'ascending' });
+      .select('title images price inStock slug -_id')
+      .lean()
+      .sort({ createdAt: 'ascending' });
     await db.disconnect();
 
-    res.status(200).json({
-      success: true,
-      data,
-    });
+    res.status(200).json(data);
   } catch (error) {
     await db.disconnect();
     console.log(error);
-    res.status(500).json({
-      data: [],
-      success: false,
-    });
+    res.status(500).json([]);
   }
-}
+};

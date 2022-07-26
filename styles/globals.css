@@ -70,3 +70,37 @@ a {
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
 }
+
+.loader__box {
+  align-items: center;
+  background-color: rgb(255, 255, 255, 0.5);
+  bottom: 0;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.loader {
+  height: 80px;
+  width: 80px;
+  border-top: 4px solid #274494;
+  border-right: 4px solid transparent;
+  border-radius: 50%;
+  animation: 1s spin linear infinite;
+  position: relative;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
