@@ -5,9 +5,10 @@ import { ProductList } from '../components/products';
 
 import { Loader } from '../components/ui';
 import { useProducts } from '../hooks/useProducts';
+import { IProduct } from '../interfaces/products';
 
 const HomePage: NextPage = () => {
-  const { products, isLoading } = useProducts('/products');
+  const { products, isLoading } = useProducts<IProduct[]>('/products');
 
   return (
     <ShopLayout

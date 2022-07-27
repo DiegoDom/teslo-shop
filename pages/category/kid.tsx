@@ -5,9 +5,12 @@ import { ProductList } from '../../components/products';
 
 import { Loader } from '../../components/ui';
 import { useProducts } from '../../hooks/useProducts';
+import { IProduct } from '../../interfaces';
 
 const KidsPage: NextPage = () => {
-  const { products, isLoading } = useProducts('/products?gender=kid');
+  const { products, isLoading } = useProducts<IProduct[]>(
+    '/products?gender=kid'
+  );
 
   return (
     <ShopLayout
