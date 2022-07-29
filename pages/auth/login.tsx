@@ -43,8 +43,8 @@ const LoginPage = () => {
       return;
     }
 
-    // TODO: Navegar a la pantalla donde el usuario estaba
-    router.replace('/');
+    const destination = router.query.p?.toString() || '/';
+    router.replace(destination);
   };
 
   return (
@@ -93,6 +93,7 @@ const LoginPage = () => {
                 label="Correo electrónico"
                 variant="filled"
                 fullWidth
+                autoComplete="new-email"
                 {...register('email', {
                   required: 'Ingrese su correo electrónico',
                   validate: (val) => validations.isEmail(val),
@@ -128,7 +129,14 @@ const LoginPage = () => {
               </Button>
             </Grid>
             <Grid item xs={12} display="flex" justifyContent="flex-end">
-              <NextLink href="/auth/register" passHref>
+              <NextLink
+                href={
+                  router.query.p
+                    ? `/auth/register?p=${router.query.p.toString()}`
+                    : '/auth/register'
+                }
+                passHref
+              >
                 <Link underline="always">
                   ¿Aún no tienes cuenta? registrate
                 </Link>

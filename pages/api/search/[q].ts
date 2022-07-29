@@ -52,9 +52,7 @@ const searchProducts = async (
     await db.disconnect();
     console.log(error);
     res.status(400).json({
-      error:
-        error.errors.status.message ||
-        'Lo sentimos ocurrio un error inesperado en el servidor',
+      error: 'Lo sentimos ocurrio un error inesperado en el servidor',
       success: false,
     });
   }
