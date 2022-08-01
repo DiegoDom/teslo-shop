@@ -1,24 +1,17 @@
+import { useContext } from 'react';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import {
-  Box,
-  Button,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, FormControl, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 
 import { ShopLayout } from '../../components/layouts';
 import { countries, jwt } from '../../utils';
+import { CartContext } from '../../context';
 
 type FormData = {
   address: string;
-  address2: string;
+  address2?: string;
   city: string;
   country: string;
   lastName: string;
@@ -27,42 +20,38 @@ type FormData = {
   zipCode: string;
 };
 
+const getAddressFromCookies = (): FormData => {
+  return {
+    address: Cookies.get('address') || '',
+    address2: Cookies.get('address2') || '',
+    city: Cookies.get('city') || '',
+    country: Cookies.get('country') || '',
+    lastName: Cookies.get('lastName') || '',
+    name: Cookies.get('name') || '',
+    phone: Cookies.get('phone') || '',
+    zipCode: Cookies.get('zipCode') || '',
+  };
+};
+
 const AddressPage = () => {
   const router = useRouter();
+  const { updateAddress } = useContext(CartContext);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    defaultValues: {
-      address: '',
-      address2: '',
-      city: '',
-      country: countries[0].code,
-      lastName: '',
-      name: '',
-      phone: '',
-      zipCode: '',
-    },
+    defaultValues: getAddressFromCookies(),
   });
 
   const onSubmit = (data: FormData) => {
-    Cookies.set('address', data.address);
-    Cookies.set('address2', data.address2 || '');
-    Cookies.set('city', data.city);
-    Cookies.set('country', data.country);
-    Cookies.set('lastName', data.lastName);
-    Cookies.set('name', data.name);
-    Cookies.set('phone', data.phone);
-    Cookies.set('zipCode', data.zipCode);
+    updateAddress(data);
     router.push('/checkout/summary');
   };
 
   return (
-    <ShopLayout
-      title="Dirección"
-      pageDescription="Confirmar dirección del destino"
-    >
+    <ShopLayout title="Dirección" pageDescription="Confirmar dirección del destino">
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
           Dirección
@@ -110,13 +99,7 @@ const AddressPage = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Dirección 2 (opcional)"
-              variant="filled"
-              fullWidth
-              autoComplete="new-address"
-              {...register('address2')}
-            />
+            <TextField label="Dirección 2 (opcional)" variant="filled" fullWidth autoComplete="new-address" {...register('address2')} />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -150,7 +133,7 @@ const AddressPage = () => {
                 select
                 variant="filled"
                 label="País"
-                defaultValue={countries[0].code}
+                defaultValue={countries[4].code}
                 {...register('country', {
                   required: 'Seleccione su país',
                 })}
@@ -180,12 +163,7 @@ const AddressPage = () => {
           </Grid>
         </Grid>
         <Box sx={{ mt: 5 }} display="flex" justifyContent="flex-end">
-          <Button
-            color="secondary"
-            className="circular-btn"
-            size="large"
-            type="submit"
-          >
+          <Button color="secondary" className="circular-btn" size="large" type="submit">
             Revisar pedido
           </Button>
         </Box>

@@ -1,27 +1,25 @@
+import { useContext } from 'react';
 import { GetServerSideProps } from 'next';
 import NextLink from 'next/link';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Divider,
-  Grid,
-  Link,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Card, CardContent, Divider, Grid, Link, Typography } from '@mui/material';
 
-import { jwt } from '../../utils';
+import { countries, jwt } from '../../utils';
 
+import { CartContext } from '../../context';
 import { CartList, OrderSumary } from '../../components/cart';
 import { ShopLayout } from '../../components/layouts';
 
 const SummaryPage = () => {
+  const { shippingAddress, numberOfItems } = useContext(CartContext);
+
+  if (!shippingAddress) {
+    return <></>;
+  }
+
+  const { name, lastName, address, city, country, zipCode, phone, address2 = '' } = shippingAddress;
+
   return (
-    <ShopLayout
-      title="Resumen de orden"
-      pageDescription="Resumen de compra de la orden"
-    >
+    <ShopLayout title="Resumen de orden" pageDescription="Resumen de compra de la orden">
       <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
         Resumen de la orden
       </Typography>
@@ -33,22 +31,25 @@ const SummaryPage = () => {
           <Card className="summary-card">
             <CardContent>
               <Typography variant="h2" component="h2">
-                Resumen (3 productos)
+                Resumen ({numberOfItems} {numberOfItems === 1 ? 'producto' : 'productos'})
               </Typography>
               <Divider sx={{ my: 1 }} />
               <Box display="flex" justifyContent="space-between">
-                <Typography variant="subtitle1">
-                  Dirección de entrega
-                </Typography>
+                <Typography variant="subtitle1">Dirección de entrega</Typography>
                 <NextLink href={`/checkout/address`} passHref>
                   <Link underline="always">Editar</Link>
                 </NextLink>
               </Box>
 
-              <Typography>Diego Dominguez</Typography>
-              <Typography>Conocido #344</Typography>
-              <Typography>Zapopan, Jalisco</Typography>
-              <Typography>México, 45128</Typography>
+              <Typography>
+                {name} {lastName}
+              </Typography>
+              <Typography>{phone}</Typography>
+              <Typography>{address}</Typography>
+              <Typography>
+                {city}, {zipCode}
+              </Typography>
+              <Typography>{countries.find((c) => c.code === country)?.name}</Typography>
               <Divider sx={{ my: 1 }} />
 
               <Box display="flex" justifyContent="flex-end" sx={{ mb: 1 }}>
