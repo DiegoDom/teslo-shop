@@ -1,12 +1,11 @@
-import { useContext } from 'react';
-import { GetServerSideProps } from 'next';
+import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Button, FormControl, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 
 import { ShopLayout } from '../../components/layouts';
-import { countries, jwt } from '../../utils';
+import { countries } from '../../utils';
 import { CartContext } from '../../context';
 
 type FormData = {
@@ -41,9 +40,23 @@ const AddressPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormData>({
-    defaultValues: getAddressFromCookies(),
+    defaultValues: {
+      address: '',
+      address2: '',
+      city: '',
+      country: countries[4].name,
+      lastName: '',
+      name: '',
+      phone: '',
+      zipCode: '',
+    },
   });
+
+  useEffect(() => {
+    reset(getAddressFromCookies());
+  }, [reset]);
 
   const onSubmit = (data: FormData) => {
     updateAddress(data);
@@ -128,7 +141,18 @@ const AddressPage = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
+            <TextField
+              label="País"
+              variant="filled"
+              fullWidth
+              autoComplete="new-address"
+              {...register('country', {
+                required: 'Ingrese el nombre de su país',
+              })}
+              error={!!errors.country}
+              helperText={errors.country?.message}
+            />
+            {/* <FormControl fullWidth>
               <TextField
                 select
                 variant="filled"
@@ -146,7 +170,7 @@ const AddressPage = () => {
                   </MenuItem>
                 ))}
               </TextField>
-            </FormControl>
+            </FormControl> */}
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -174,7 +198,7 @@ const AddressPage = () => {
 
 // You should use getServerSideProps when:
 // - Only if you need to pre-render a page whose data must be fetched at request time
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+/* export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { token = '' } = req.cookies;
 
   let isValidToken = false;
@@ -198,6 +222,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   return {
     props: {},
   };
-};
+}; */
 
 export default AddressPage;

@@ -1,16 +1,23 @@
-import { useContext } from 'react';
-import { GetServerSideProps } from 'next';
+import { useContext, useEffect } from 'react';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import { Box, Button, Card, CardContent, Divider, Grid, Link, Typography } from '@mui/material';
-
-import { countries, jwt } from '../../utils';
+import Cookies from 'js-cookie';
 
 import { CartContext } from '../../context';
-import { CartList, OrderSumary } from '../../components/cart';
+/* import { countries, jwt } from '../../utils'; */
 import { ShopLayout } from '../../components/layouts';
+import { CartList, OrderSumary } from '../../components/cart';
 
 const SummaryPage = () => {
+  const router = useRouter();
   const { shippingAddress, numberOfItems } = useContext(CartContext);
+
+  useEffect(() => {
+    if (!Cookies.get('name')) {
+      router.push('/checkout/address');
+    }
+  }, [router]);
 
   if (!shippingAddress) {
     return <></>;
@@ -49,7 +56,8 @@ const SummaryPage = () => {
               <Typography>
                 {city}, {zipCode}
               </Typography>
-              <Typography>{countries.find((c) => c.code === country)?.name}</Typography>
+              {/* <Typography>{countries.find((c) => c.code === country)?.name}</Typography> */}
+              <Typography>{country}</Typography>
               <Divider sx={{ my: 1 }} />
 
               <Box display="flex" justifyContent="flex-end" sx={{ mb: 1 }}>
@@ -74,7 +82,7 @@ const SummaryPage = () => {
 
 // You should use getServerSideProps when:
 // - Only if you need to pre-render a page whose data must be fetched at request time
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+/* export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { token = '' } = req.cookies;
 
   let isValidToken = false;
@@ -98,6 +106,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   return {
     props: {},
   };
-};
+}; */
 
 export default SummaryPage;

@@ -1,17 +1,12 @@
 import { useContext, useState } from 'react';
+import { GetServerSideProps } from 'next';
+import { getSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
-import {
-  Box,
-  Button,
-  Chip,
-  Grid,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { useForm } from 'react-hook-form';
+
+import { Box, Button, Chip, Grid, Link, TextField, Typography } from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
+import { useForm } from 'react-hook-form';
 
 import { AuthContext } from '../../context';
 import { AuthLayout } from '../../components/layouts';
@@ -46,24 +41,18 @@ const RegisterPage = () => {
       return;
     }
 
-    const destination = router.query.p?.toString() || '/';
-    router.replace(destination);
+    await signIn('credentials', { email, password });
+
+    /* const destination = router.query.p?.toString() || '/';
+    router.replace(destination); */
   };
 
   return (
     <AuthLayout title="Crear cuenta">
       <form onSubmit={handleSubmit(onRegisterUser)} noValidate>
-        <Box
-          sx={{ width: 450, padding: '30px 20px', borderRadius: 3 }}
-          className="summary-card"
-        >
+        <Box sx={{ width: 450, padding: '30px 20px', borderRadius: 3 }} className="summary-card">
           <NextLink href={'/'} passHref>
-            <Link
-              display={'flex'}
-              alignItems={'center'}
-              justifyContent="center"
-              sx={{ mb: 2 }}
-            >
+            <Link display={'flex'} alignItems={'center'} justifyContent="center" sx={{ mb: 2 }}>
               <Typography variant="h6">Teslo |</Typography>
               <Typography sx={{ ml: 0.5 }}>Shop</Typography>
             </Link>
@@ -129,29 +118,13 @@ const RegisterPage = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button
-                type="submit"
-                color="secondary"
-                className="circular-btn"
-                size="large"
-                fullWidth
-                disabled={showError}
-              >
+              <Button type="submit" color="secondary" className="circular-btn" size="large" fullWidth disabled={showError}>
                 Registrarme
               </Button>
             </Grid>
             <Grid item xs={12} display="flex" justifyContent="flex-end">
-              <NextLink
-                passHref
-                href={
-                  router.query.p
-                    ? `/auth/login?p=${router.query.p.toString()}`
-                    : '/auth/login'
-                }
-              >
-                <Link underline="always">
-                  ¿Ya tienes cuenta? Iniciar sesión
-                </Link>
+              <NextLink passHref href={router.query.p ? `/auth/login?p=${router.query.p.toString()}` : '/auth/login'}>
+                <Link underline="always">¿Ya tienes cuenta? Iniciar sesión</Link>
               </NextLink>
             </Grid>
           </Grid>
@@ -159,6 +132,27 @@ const RegisterPage = () => {
       </form>
     </AuthLayout>
   );
+};
+
+// You should use getServerSideProps when:
+// - Only if you need to pre-render a page whose data must be fetched at request time
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+  const session = await getSession({ req });
+
+  const { p = '/' } = query;
+
+  if (session) {
+    return {
+      redirect: {
+        destination: p.toString(),
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
 };
 
 export default RegisterPage;

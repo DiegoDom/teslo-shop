@@ -1,5 +1,5 @@
 import { FC, useEffect, useReducer } from 'react';
-import { useRouter } from 'next/router';
+import { useSession, signOut } from 'next-auth/react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -24,19 +24,20 @@ interface Props {
 
 export const AuthProvider: FC<Props> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE);
-
-  const router = useRouter();
+  const { data, status } = useSession();
 
   useEffect(() => {
-    /* const token = Cookies.get('token');
-    console.log(token); */
-    renovarSesion();
-  }, []);
+    if (status === 'authenticated') {
+      /* console.log({ user: data.user }); */
+      dispatch({ type: '[Auth] - Login', payload: data.user as IUser });
+    }
+  }, [status, data]);
 
-  const loginUser = async (
-    email: string,
-    password: string
-  ): Promise<boolean> => {
+  /* useEffect(() => {
+    renovarSesion();
+  }, []); */
+
+  const loginUser = async (email: string, password: string): Promise<boolean> => {
     try {
       const { data } = await tesloApi.post('/auth/login', { email, password });
       const { token, user } = data;
@@ -50,11 +51,7 @@ export const AuthProvider: FC<Props> = ({ children }) => {
     }
   };
 
-  const registerUser = async (
-    name: string,
-    email: string,
-    password: string
-  ): Promise<{ hasError: boolean; message?: string }> => {
+  const registerUser = async (name: string, email: string, password: string): Promise<{ hasError: boolean; message?: string }> => {
     try {
       const { data } = await tesloApi.post('/auth/register', {
         name,
@@ -102,9 +99,18 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   };
 
   const logout = () => {
-    Cookies.remove('token');
     Cookies.remove('cart');
-    router.reload();
+    Cookies.remove('address');
+    Cookies.remove('address2');
+    Cookies.remove('city');
+    Cookies.remove('country');
+    Cookies.remove('lastName');
+    Cookies.remove('name');
+    Cookies.remove('phone');
+    Cookies.remove('zipCode');
+    signOut();
+    // Cookies.remove('token');
+    // router.reload();
   };
 
   return (
