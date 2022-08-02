@@ -57,10 +57,11 @@ const createOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     // Todo bien hasta este punto
     const userID = session.user._id;
     const newOrder = new Order({ ...req.body, isPaid: false, user: userID });
+    newOrder.total = Math.round(newOrder.total * 100) / 100;
     await newOrder.save();
     await db.disconnect();
 
-    return res.status(201).json(newOrder);
+    return res.status(200).json(newOrder);
   } catch (error: any) {
     await db.disconnect();
     console.log(error);
@@ -69,6 +70,4 @@ const createOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
       success: false,
     });
   }
-
-  // return res.status(201).json(req.body);
 };
