@@ -2,7 +2,9 @@ import { FC, useEffect, useReducer } from 'react';
 import Cookies from 'js-cookie';
 
 import { CartContext, cartReducer } from './';
-import { ICartProduct } from '../../interfaces';
+import { ICartProduct, ShippingAddress, IOrder } from '../../interfaces';
+import { tesloApi } from '../../api';
+import axios from 'axios';
 
 export interface CartState {
   cart: ICartProduct[];
@@ -12,17 +14,6 @@ export interface CartState {
   tax: number;
   total: number;
   shippingAddress?: ShippingAddress;
-}
-
-export interface ShippingAddress {
-  address: string;
-  address2?: string;
-  city: string;
-  country: string;
-  lastName: string;
-  name: string;
-  phone: string;
-  zipCode: string;
 }
 
 const CART_INITIAL_STATE: CartState = {
@@ -177,6 +168,51 @@ export const CartProvider: FC<Props> = ({ children }) => {
     });
   };
 
+  const createOrder = async (): Promise<{ success: boolean; data: string }> => {
+    if (!state.shippingAddress) {
+      throw new Error('No se ingreso la dirección de entrega');
+    }
+
+    const body: IOrder = {
+      orderItems: state.cart.map((p) => ({
+        ...p,
+        size: p.size!,
+      })),
+      shippingAddress: state.shippingAddress,
+      numberOfItems: state.numberOfItems,
+      subTotal: state.subTotal,
+      tax: state.tax,
+      total: state.total,
+      isPaid: false,
+    };
+
+    try {
+      const { data } = await tesloApi.post<IOrder>('/orders', body);
+
+      dispatch({ type: '[Cart] - Order complete' });
+
+      return {
+        success: true,
+        data: data._id!,
+      };
+    } catch (error) {
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        const errors = error.response?.data as {
+          error: string;
+        };
+        return {
+          success: false,
+          data: errors.error,
+        };
+      }
+      return {
+        success: false,
+        data: 'Lo sentimos ocurrio un error inesperado',
+      };
+    }
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -186,6 +222,7 @@ export const CartProvider: FC<Props> = ({ children }) => {
         updateCartQuantity,
         removeCartProduct,
         updateAddress,
+        createOrder,
       }}
     >
       {children}

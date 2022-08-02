@@ -1,30 +1,7 @@
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
-import {
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  Input,
-  InputAdornment,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-} from '@mui/material';
-import {
-  AccountCircleOutlined,
-  AdminPanelSettings,
-  CategoryOutlined,
-  ConfirmationNumberOutlined,
-  EscalatorWarningOutlined,
-  FemaleOutlined,
-  LoginOutlined,
-  MaleOutlined,
-  SearchOutlined,
-  VpnKeyOutlined,
-} from '@mui/icons-material';
+import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from '@mui/material';
+import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from '@mui/icons-material';
 import { AuthContext, UiContext } from '../../context';
 
 export const SideMenu = () => {
@@ -45,12 +22,7 @@ export const SideMenu = () => {
   };
 
   return (
-    <Drawer
-      open={isMenuOpen}
-      anchor="right"
-      sx={{ backdropFilter: 'blur(4px)', transition: 'all 0.5s ease-out' }}
-      onClose={toggleSideMenu}
-    >
+    <Drawer open={isMenuOpen} anchor="right" sx={{ backdropFilter: 'blur(4px)', transition: 'all 0.5s ease-out' }} onClose={toggleSideMenu}>
       <Box sx={{ width: 250, paddingTop: 5 }}>
         <List>
           <ListItem>
@@ -80,7 +52,7 @@ export const SideMenu = () => {
                 <ListItemText primary={'Perfil'} />
               </ListItem>
 
-              <ListItem button>
+              <ListItem button onClick={() => navigateTo('/orders/history')}>
                 <ListItemIcon>
                   <ConfirmationNumberOutlined />
                 </ListItemIcon>
@@ -89,33 +61,21 @@ export const SideMenu = () => {
             </>
           )}
 
-          <ListItem
-            onClick={() => navigateTo('/category/men')}
-            button
-            sx={{ display: { xs: '', sm: 'none' } }}
-          >
+          <ListItem onClick={() => navigateTo('/category/men')} button sx={{ display: { xs: '', sm: 'none' } }}>
             <ListItemIcon>
               <MaleOutlined />
             </ListItemIcon>
             <ListItemText primary={'Hombres'} />
           </ListItem>
 
-          <ListItem
-            onClick={() => navigateTo('/category/women')}
-            button
-            sx={{ display: { xs: '', sm: 'none' } }}
-          >
+          <ListItem onClick={() => navigateTo('/category/women')} button sx={{ display: { xs: '', sm: 'none' } }}>
             <ListItemIcon>
               <FemaleOutlined />
             </ListItemIcon>
             <ListItemText primary={'Mujeres'} />
           </ListItem>
 
-          <ListItem
-            onClick={() => navigateTo('/category/kid')}
-            button
-            sx={{ display: { xs: '', sm: 'none' } }}
-          >
+          <ListItem onClick={() => navigateTo('/category/kid')} button sx={{ display: { xs: '', sm: 'none' } }}>
             <ListItemIcon>
               <EscalatorWarningOutlined />
             </ListItemIcon>
@@ -130,10 +90,7 @@ export const SideMenu = () => {
               <ListItemText primary={'Salir'} />
             </ListItem>
           ) : (
-            <ListItem
-              button
-              onClick={() => navigateTo(`/auth/login?p=${router.asPath}`)}
-            >
+            <ListItem button onClick={() => navigateTo(`/auth/login?p=${router.asPath}`)}>
               <ListItemIcon>
                 <VpnKeyOutlined />
               </ListItemIcon>
