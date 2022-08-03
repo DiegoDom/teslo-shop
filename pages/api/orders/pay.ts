@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getSession } from 'next-auth/react';
 import axios from 'axios';
 import { IOrder, IPaypal } from '../../../interfaces';
 import { db } from '../../../database';
 import { Order } from '../../../models';
+import { isValidObjectId } from 'mongoose';
 
 type Data = { success: boolean; error: string } | IOrder;
 
@@ -45,8 +47,16 @@ const getPaypalBearerToken = async (): Promise<string | null> => {
 };
 
 const payOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  // TODO: Validar sesion del usuario
-  // TODO: Validar mongoID
+
+  // Verificar la sesión del usuario
+  const session: any = await getSession({ req });
+
+  if (!session) {
+    return res.status(401).json({
+      error: 'El usuario no tiene una sesión activa...',
+      success: false,
+    });
+  }
 
   const paypalBearerToken = await getPaypalBearerToken();
 
@@ -58,6 +68,13 @@ const payOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   }
 
   const { transactionId = '', orderId = '' } = req.body;
+
+  if (!isValidObjectId(orderId)) {
+    return res.status(401).json({
+      error: 'No se pudo confirmar la orden en el sistema...',
+      success: false,
+    });
+  }
 
   const { data } = await axios.get<IPaypal.PaypalOrderStatusResponse>(`${process.env.PAYPAL_ORDERS_URL}/${transactionId}`, {
     headers: {
@@ -100,4 +117,3 @@ const payOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 
   return res.status(201).json(dbOrder);
 };
-/* 0KD84701TC7577116 */
