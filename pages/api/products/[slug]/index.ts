@@ -3,7 +3,7 @@ import { Product } from '../../../../models';
 import { db } from '../../../../database';
 import { IProduct } from '../../../../interfaces';
 
-type Data = IProduct | { success: boolean; error: string };
+type Data = IProduct | { success: boolean; error: string; };
 
 export default function handler(
   req: NextApiRequest,
@@ -41,6 +41,10 @@ const getProductBySlug = async (
         success: false,
       });
     }
+
+    product.images = product.images.map(image => {
+      return image.includes('http') ? image : `${process.env.HOST_NAME}/products/${image}`;
+    });
 
     res.status(200).json(product);
   } catch (error: any) {

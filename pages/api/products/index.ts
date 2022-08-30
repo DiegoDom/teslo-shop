@@ -31,13 +31,21 @@ const getProducts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     }
 
     await db.connect();
-    const data = await Product.find(condition)
+    const products = await Product.find(condition)
       .select('title images price inStock slug -_id')
       .lean()
       .sort({ createdAt: 'ascending' });
     await db.disconnect();
 
-    res.status(200).json(data);
+    const updatedProducts = products.map(product => {
+      product.images = product.images.map(image => {
+        return image.includes('http') ? image : `${process.env.HOST_NAME}/products/${image}`;
+      });
+
+      return product;
+    });
+
+    res.status(200).json(updatedProducts);
   } catch (error) {
     await db.disconnect();
     console.log(error);

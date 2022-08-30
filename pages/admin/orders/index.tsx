@@ -1,12 +1,12 @@
-import useSWR from 'swr'
-import { Chip, Grid } from '@mui/material'
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
-import { ConfirmationNumberOutlined } from '@mui/icons-material'
+import useSWR from 'swr';
+import { Chip, Grid } from '@mui/material';
+import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { ConfirmationNumberOutlined } from '@mui/icons-material';
 
-import { Loader } from '../../../components/ui'
-import { IOrder, IUser } from '../../../interfaces'
-import { currency } from '../../../utils'
-import { AdminLayout } from '../../../components/layouts'
+import { Loader } from '../../../components/ui';
+import { IOrder, IUser } from '../../../interfaces';
+import { currency } from '../../../utils';
+import { AdminLayout } from '../../../components/layouts';
 
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'Order ID', width: 220 },
@@ -21,7 +21,7 @@ const columns: GridColDef[] = [
         <Chip variant="outlined" label="Pagada" color="success" />
       ) : (
         <Chip variant="outlined" label="Pendiente" color="error" />
-      )
+      );
     },
   },
   {
@@ -39,17 +39,17 @@ const columns: GridColDef[] = [
         <a href={`/admin/orders/${row.id}`} target="_blank" rel="noreferrer">
           Ver detalles
         </a>
-      )
+      );
     },
   },
   { field: 'createdAt', headerName: 'Fecha', width: 250 },
-]
+];
 
 const OrdersPage = () => {
-  const { data, error } = useSWR<IOrder[]>('/api/admin/orders')
+  const { data, error } = useSWR<IOrder[]>('/api/admin/orders');
 
   if (!error && !data) {
-    return <Loader />
+    return <Loader />;
   }
 
   const rows = data!.map((order) => ({
@@ -60,7 +60,7 @@ const OrdersPage = () => {
     isPaid: order.isPaid,
     noProducts: order.numberOfItems,
     createdAt: order.createdAt,
-  }))
+  }));
 
   return (
     <AdminLayout
@@ -79,7 +79,7 @@ const OrdersPage = () => {
         </Grid>
       </Grid>
     </AdminLayout>
-  )
-}
+  );
+};
 
-export default OrdersPage
+export default OrdersPage;

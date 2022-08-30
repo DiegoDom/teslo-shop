@@ -9,7 +9,7 @@ import {
   Chip,
   Grid,
   Link,
-  Typography,
+  Typography
 } from '@mui/material';
 import { currency } from '../../utils';
 
@@ -22,9 +22,7 @@ export const ProductCard: FC<Props> = ({ product }) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const productImage = useMemo(() => {
-    return isHovered
-      ? `/products/${product.images[1]}`
-      : `/products/${product.images[0]}`;
+    return isHovered ? product.images[1] : product.images[0];
   }, [isHovered, product.images]);
 
   return (
@@ -41,22 +39,22 @@ export const ProductCard: FC<Props> = ({ product }) => {
             <CardActionArea>
               {product.inStock <= 0 && (
                 <Chip
-                  color="primary"
-                  label="Producto no disponible"
+                  color='primary'
+                  label='Producto no disponible'
                   sx={{
                     position: 'absolute',
                     zIndex: 9,
                     bottom: '10px',
                     right: '10px',
-                    opacity: 0.7,
+                    opacity: 0.7
                   }}
                 />
               )}
               <CardMedia
-                className="fadeIn"
-                component="img"
+                className='fadeIn'
+                component='img'
                 sx={{
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.3s ease'
                 }}
                 image={productImage}
                 alt={product.title}
@@ -68,7 +66,7 @@ export const ProductCard: FC<Props> = ({ product }) => {
       </Card>
       <Box
         sx={{ mt: 1, display: isImageLoaded ? 'block' : 'none' }}
-        className="fadeIn"
+        className='fadeIn'
       >
         <Typography fontWeight={700}>{product.title}</Typography>
         <Typography fontWeight={500}>
